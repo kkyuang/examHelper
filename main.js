@@ -14,9 +14,15 @@ app.get('/', function(request, response) {
     html = readHTML('main')
     response.send(html)
 });
- 
-app.get('/page', function(req, res) { 
-  return res.send('/page');
+
+//css 라우팅
+app.get('/css/:name', function(request, response) {
+  response.send(fs.readFileSync('css/' + request.params.name))
+});
+
+//js 라우팅
+app.get('/js/:name', function(request, response) {
+  response.send(fs.readFileSync('js/' + request.params.name))
 });
  
 app.listen(80, function() {
