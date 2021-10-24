@@ -1,13 +1,15 @@
-var express = require('express')
-var app = express()
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+var app = require('express')()
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 var fs = require('fs');
 
 //필요함수 정의
-function readHTML(name){
+function readHTML(name){ //html 읽기
     html = fs.readFileSync('html/' + name + '.html', 'utf-8');
     return html
+}
+function removeTag(text){ //태그 지우기
+  return text.replaceAll('<', '&lt').replaceAll('>', '&gt')
 }
  
 //route, routing
@@ -20,6 +22,14 @@ app.get('/', function(request, response) {
 //소켓 통신
 io.on('connection', (socket) => {
   console.log('connected!')
+  socket.on('chat', (data)=>{
+    var msgData = {
+      nickname: removeTag(data.nickname),
+      msg: removeTag(data.msg)
+    }
+    console.log(msgData.nickname + ": " + msgData.msg)
+    io.emit('newchat', msgData)
+  })
 })
 
 //css 라우팅
@@ -32,6 +42,6 @@ app.get('/js/:name', function(request, response) {
   response.send(fs.readFileSync('js/' + request.params.name))
 });
  
-app.listen(80, function() {
+server.listen(80, function() {
   console.log('Example app listening on port 80!')
 });

@@ -25,6 +25,11 @@ button{
     transform: translateX(-50%);
 }
 
+#one-chat{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 .no-drag {
     -ms-user-select: none;
     -moz-user-select: none;
