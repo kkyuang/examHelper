@@ -2,6 +2,9 @@ var app = require('express')()
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
+var cookieParser = require('cookie-parser')
+
+app.use(cookieParser())
 
 //필요함수 정의
 function readHTML(name){ //html 읽기
@@ -106,6 +109,12 @@ io.on('connection', (socket) => {
   socket.on('chatListReq', (data)=>{
     socket.emit('chatListRes', chatRead(chatRoomName, data))
   })
+
+  socket.on('name-cookie', (data) =>{ //닉네임 쿠키 저장
+    //socket.cookie('nickname', data)
+  })
+  var nickname = socket.handshake.headers.cookie
+  console.log(nickname)
 })
 
 //css 라우팅

@@ -50,6 +50,10 @@ $(document).ready(() => {
     //소켓서버열기
     var socket = io();
 
+    $('input#name-input').on('change keyup paste', () => {
+        socket.emit('name-cookie', $(this).val)
+    })
+
     $("input#message-input").keydown((key) => {
         if(key.keyCode == 13){
             scrollBottom()
