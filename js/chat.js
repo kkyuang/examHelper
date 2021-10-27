@@ -93,9 +93,9 @@ $(document).ready(() => {
         `)
 
         //스크롤 맨 밑
-        if(isBottom){
+        //if(isBottom){
             scrollBottom()
-        }
+        //}
     })
     socket.on('chatList', (data) => { //채팅 리스트 얻어오기
         if(isStarted){

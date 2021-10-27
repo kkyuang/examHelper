@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -7,12 +8,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="http://fonts.googleapis.com/earlyaccess/notosanskr.css" rel="stylesheet">
-    <title>2021 거창덕유중학교 고사성어 외우기</title>
-    <meta name="title" content="2021 거창덕유중학교 고사성어 외우기">
+    <title>나에게 어울리는 영어 단어는?</title>
+    <meta name="title" content="나에게 어울리는 영어 단어는?">
+    <meta name="subject" content="당신에게 어울리는 영어 단어를 찾아드립니다 ;) - MBTI 기반 영어 단어 성격테스트">
+    <meta name="keywords" content="MBTI,성격테스트,영어단어,영어,단어,성격,테스트">
     <meta name="author" content="뀨앙지윤">
-    <link rel="stylesheet" href="/css/style.css">
-    <meta property="og:title" content="2021 거창덕유중학교 고사성어 외우기" />
-    <meta property="og:description" content="고사성어를 쉽게 외울 수 있는 웹사이트입니다 :)" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="canonical" href="https://kkyuang.github.io/eng-word-mbti" />
+    <meta property="og:url" content="https://kkyuang.github.io/eng-word-mbti" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="나에게 어울리는 영어 단어는?" />
+    <meta property="og:description" content="당신에게 어울리는 영어 단어를 찾아드립니다 ;) - MBTI 기반 영어 단어 성격테스트" />
+    <meta property="og:image" content="https://i.ibb.co/BCMFHp2/img.png"></a>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <script type="text/javascript" src="data.js"></script>
+    <meta name="google-site-verification" content="AOYdMvmso3-qCALEYplV_sXqJS83q9MP_nundQB5r_s" />
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8WKB5KSJG"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
@@ -146,7 +159,7 @@
 
         $(function () {
             var effectList = {
-                '.main-btn': [
+                '.start-btn': [
                     '#556070',
                     'white',
                     'white',
@@ -223,17 +236,67 @@
 
 <body class="no-drag">
     <nav class="top-nav-bar">
-        <a class="navbar-brand" href="https://kkyuang.github.io/eng-word-mbti">2021 거창덕유중학교 고사성어 외우기</a>
-        <a class="navbar-brand" style="color: #808080" href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
+        <a class="navbar-brand" href="https://kkyuang.github.io/eng-word-mbti">나에게 어울리는 영어 단어는?</a>
+        <a class="navbar-brand" style="color: #808080" href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 뀨앙지윤</a>
     </nav>
     <div id="main-div" class="pannel">
-        <h1 class="title" style="font-size: 1.5em; height: 2em; margin-top: 1.5em;">고사성어 외우기</h1>
+        <h1 class="title" style="font-size: 1.5em; height: 2em; margin-top: 1.5em;">나에게 어울리는 영어 단어는?</h1>
         <!--<img id="main-img" src="img/main-img.png" alt="메인 이미지">-->
+        <img id="main-img" src="img/main-img.png" alt="메인 이미지">
         <br>
-        <button class="main-btn" onclick="test_start()">객관식 모드 ✔️</button>
-        <button class="main-btn" onclick="test_start()">주관식 모드 ✍️</button>
-        <button class="main-btn" onclick="test_start()">랭킹 보기 🥇</button>
+        <button class="start-btn" onclick="test_start()">시작하기 🚀</button>
     </div>
+    <div id="test-div" class="pannel">
+        <div class="top-bar">
+            <div id="up">
+                <button id="back-btn" onclick="answer('back')">← 뒤로가기</button>
+                <span id="progress-text">1/12</span>
+            </div>
+            <div id="progress-bar">
+                <div id="progress-bar-finished"></div>
+            </div>
+        </div>
+        <div class="question">
+            <div class="question-text">
+                <span id="question-text">
+                    당신은 ~한가요?
+                </span>
+            </div>
+        </div>
+        <div class="answer">
+            <button class="answer-btn" onclick="answer(true)" id="answer-0">예 ~합니다</button>
+            <button class="answer-btn" onclick="answer(false)" id="answer-1">아니요 ~하지 않습니다</button>
+        </div>
+    </div>
+    <div id="result-div" class="pannel" style="height: auto; top: 6.25%; left: 50%; transform: translate(-50%, 0);">
+        <div class="top-category">
+            <h1 class="title" style="margin-bottom: 0.2em; font-family: 'montecarlo', sans-serif; font-size: 3em" id="result-name">
+                고양이
+            </h1>
+            <span id="result-korean">
+            </span>
+        </div>
+        <div class="bottom-descript">
+            <span id="result-text">
+            </span>
+            <div class="compatibility">
+                <div id="good" class="part">
+                    <span id="good-category-explain" style="font-size: 1em;">잘 맞아요 🙂</span>
+                    <br>
+                    <span id="good-category-text" style="font-size: 1.2em; font-family: 'montecarlo', sans-serif;">고양이1</span>
+                </div>
+                <div id="bad" class="part">
+                    <span id="bad-category-explain" style="font-size: 1em;">안 맞아요 🙁</span>
+                    <br>
+                    <span id="bad-category-text" style="font-size: 1.2em; font-family: 'montecarlo', sans-serif;">고양이2</span>
+                </div>
+            </div>
+        </div>
+        <button class="share-btn" onclick="clipBoard('https://kkyuang.github.io/eng-word-mbti')">링크 복사 📋</button>
+        <button class="retry-btn" onclick="window.location.href=''">다시 하기 🔄</button>
+        <a href="./withpeople.html" style="display:block; margin-bottom: 2em;">도움을 주신 분들/주의사항</a>
+    </div>
+    <iframe width="320" id="ad" style="position: absolute; bottom: 0; left: 50%; transform: translate(-50%, 0);" height="50" allowtransparency="true" src="https://mtab.clickmon.co.kr/pop/wp_m_320.php?PopAd=CM_M_1003067%7C%5E%7CCM_A_1025729%7C%5E%7CAdver_M_1046207&mon_rf=REFERRER_URL" frameborder="0" scrolling="no"></iframe>
 </body>
 
 </html>

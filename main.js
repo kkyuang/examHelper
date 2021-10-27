@@ -71,10 +71,14 @@ function chatSave(roomName, msgData){ //새 채팅 내용 저장
   chatCountAppend(roomName)
 }
  
-//route, routing
-//app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/', function(request, response) {
-    var html = readHTML('main')
+  var html = readHTML('main')
+  response.send(html)
+});
+
+//채팅 서비스 이용
+app.get('/chat', function(request, response) {
+    var html = readHTML('chat')
     response.send(html)
 });
 
