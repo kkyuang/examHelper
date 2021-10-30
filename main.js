@@ -2,9 +2,22 @@ var app = require('express')()
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
+var crypto = require('crypto');
 var cookieParser = require('cookie-parser')
-
+var bodyParser = require('body-parser')
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: true,
+    store : new FileStore()
+  })
+);
 
 //필요함수 정의
 function readHTML(name){ //html 읽기
@@ -70,11 +83,67 @@ function chatSave(roomName, msgData){ //새 채팅 내용 저장
   fs.writeFileSync('data/' + roomName + '/' + fileName, JSON.stringify(chats))
   chatCountAppend(roomName)
 }
+//암호화
+function makeHash(password, salt){
+  var hashPassword = crypto.createHash("sha512").update(password + salt).digest("hex");
+  return hashPassword
+}
+//소금뿌리기
+function makeSalt(){
+  return Math.round((new Date().valueOf() * Math.random())) + ""
+}
+
+function newUserDir(){ 
+  if(fs.existsSync('users')){
+    return true
+  }
+  else{
+    fs.mkdirSync('users')
+  }
+}
+//유저 저장
+function saveUser(UserOBJ){
+  newUserDir()
+  if(fs.existsSync('users/' + UserOBJ.id)){
+    return false
+  }
+  else{
+    fs.mkdirSync('users/' + UserOBJ.id)
+  }
+  fs.writeFileSync('users/' + UserOBJ.id + '/info.json', JSON.stringify(UserOBJ))
+  return true
+}
+//유저 인출
+function openUser(UserID){
+  newUserDir()
+  if(fs.existsSync('users/' + UserID)){
+    return JSON.parse(fs.readFileSync('users/' + UserID + '/info.json', 'utf-8'))
+  }
+  else{
+    return false
+  }
+}
+
 
 //메인
 app.get('/', function(request, response) {
   var html = readHTML('main')
+  if(request.session.logined == true){
+    html = html.replace('로그인하지 않음', request.session.user_id).replace('로그인 ←', '로그아웃 →')
+  }
   response.send(html)
+});
+
+//로그인
+app.get('/login', function(req, response) {
+  if(req.session.logined == true){
+    req.session.logined = false
+    response.redirect('/')
+  }
+  else{
+    var html = readHTML('login')
+    response.send(html)
+  }
 });
 
 //객관식 모드
@@ -100,6 +169,50 @@ app.get('/chat', function(request, response) {
     var html = readHTML('chat')
     response.send(html)
 });
+
+//회원가입
+app.post("/signup", function(req,res,next){
+  var body = req.body;
+  console.log(req.body)
+  var salt = makeSalt()
+  var pw = makeHash(body.password, salt)
+  var newUser = {
+    id: body.id,
+    pw: pw,
+    salt: salt
+  }
+  if(!saveUser(newUser)){
+    res.send(readHTML('login') + '<script>alert("같은 사용자가 있습니다. 다른 닉네임으로 다시 시도해 주세요.")</script>')
+  }
+  else{
+    req.session.user_id = body.id
+    req.session.logined = true
+    console.log(req.session.user_id)
+    res.redirect('/');
+  }
+})
+
+//로그인
+app.post("/login", function(req,res,next){
+  var body = req.body;
+  console.log(req.body)
+  var userOBJ = openUser(body.id)
+  if(!userOBJ){
+    res.send(readHTML('login') + '<script>alert("가입되지 않은 사용자입니다. 회원가입을 먼저 진행해 주세요.")</script>')
+  }
+  else{
+    var salt = userOBJ.salt
+    var pw = makeHash(body.password, salt)
+    if(pw == userOBJ.pw){
+      req.session.user_id = userOBJ.id
+      req.session.logined = true
+      res.redirect('/');
+    }
+    else{
+      res.send(readHTML('login') + '<script>alert("비밀번호가 틀렸습니다. 다시 입력해 주세요.")</script>')
+    }
+  }
+})
 
 //소켓 통신
 io.on('connection', (socket) => {
@@ -151,7 +264,6 @@ app.get('/js/:name', function(request, response) {
 });
 
 //폰트 라우팅
-
 server.listen(80, function() {
   console.log('Example app listening on port 80!')
 });

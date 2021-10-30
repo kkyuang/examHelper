@@ -12,8 +12,21 @@
     color:black;
     border-radius: 1em;
     border-color: #556070;
+    background-color: #ffffff;
     padding: auto;
     margin-top: 32px;
+}
+
+input{
+    width: 50%;
+    height: 2em;
+    font-size: 1em;
+    color:black;
+    border-radius: 1em;
+    border-color: #556070;
+    padding: auto;
+    margin-top: 32px;
+    padding: 5px;
 }
 
 body{

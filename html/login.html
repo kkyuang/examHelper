@@ -48,21 +48,69 @@
                 });
             }
         })
+
+        function blankCheck(text, alertmsg) {
+            if (text == '' || text == null) {
+                alert(alertmsg);
+                return false;
+            }
+            var blank_pattern = /^\s+|\s+$/g;
+            if (text.replace(blank_pattern, '') == "") {
+                alert(alertmsg);
+                return false;
+            }
+            return true
+        }
+
+        //데이터 체크
+        function checkData(id, pw) {
+            if (!blankCheck(id, '닉네임을 입력해 주세요')) {
+                return false
+            }
+            if (!blankCheck(pw, '비밀번호를 입력해 주세요')) {
+                return false
+            }
+            return true
+        }
+
+        $(document).ready(() => {
+            $("#signup-btn").click(() => {
+                if(checkData($("#signup-nickname-input").val(), $("#signup-password-input").val())){
+                    $("#signup-form").submit()
+                }
+            })
+            $("#login-btn").click(() => {
+                if(checkData($("#login-nickname-input").val(), $("#login-password-input").val())){
+                    $("#login-form").submit()
+                }
+            })
+        })
     </script>
 </head>
 
 <body class="no-drag">
     <nav class="top-nav-bar">
-        <a class="navbar-brand" href="https://kkyuang.github.io/eng-word-mbti">2021 거창덕유중학교 고사성어 외우기</a>
-        <a class="navbar-brand" style="color: #808080" href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
+        <a class="navbar-brand" href="/">2021 거창덕유중학교 고사성어 외우기</a>
+        <a class="navbar-brand" style="color: #808080"
+            href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
     </nav>
     <div id="main-div" class="pannel">
-        <h1 class="title" style="font-size: 42px; height: 2em; margin-top: 1.5em;">고사성어 외우기</h1>
-        <!--<img id="main-img" src="img/main-img.png" alt="메인 이미지">-->
+        <h1 class="title" style="font-size: 42px; height: 2em; margin-top: 1.5em;">로그인/회원가입</h1>
         <br>
-        <button class="main-btn" onclick="location.href='/choice'">객관식 모드 ✔️</button>
-        <button class="main-btn" onclick="location.href='/question'">주관식 모드 ✍️</button>
-        <button class="main-btn" onclick="location.href='/rank'">랭킹 보기 🥇</button>
+        <div style="position:absolute; left: 50%; top: 50%; transform:translate(-50%, -50%); width: 100%;">
+            <form action="/login" method="post" id="login-form" style="margin-bottom: 0;">
+                <input type="text" placeholder="닉네임" id="login-nickname-input" name="id">
+                <input type="password" style="margin-top: 5px;" placeholder="패스워드" id="login-password-input"
+                    name="password">
+            </form>
+            <button id="login-btn" class="main-btn" style="margin-top: 5px;">로그인</button>
+            <form action="/signup" method="post" id="signup-form" style="margin-bottom: 0;">
+                <input type="text" placeholder="닉네임" id="signup-nickname-input" name="id">
+                <input type="password" style="margin-top: 5px;" placeholder="패스워드" id="signup-password-input"
+                    name="password">
+            </form>
+            <button id="signup-btn" class="main-btn" style="margin-top: 5px;">회원가입 ←</button>
+        </div>
     </div>
 </body>
 
