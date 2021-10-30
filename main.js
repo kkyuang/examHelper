@@ -152,6 +152,17 @@ app.get('/choice', function(request, response) {
   response.send(html)
 });
 
+//객관식 모드
+app.get('/choice-prepare', function(request, response) {
+  if(request.session.logined == true){
+    var html = readHTML('choice-prepare')
+  }
+  else{
+    var html = readHTML('choice-prepare') + '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+  }
+  response.send(html)
+});
+
 //주관식 모드
 app.get('/question', function(request, response) {
   var html = readHTML('question')

@@ -17,6 +17,18 @@
     margin-top: 32px;
 }
 
+.list-btn{
+    width: 50%;
+    height: 2em;
+    font-size: 1.5em;
+    color:black;
+    border-radius: 1em;
+    border-color: #556070;
+    background-color: #ffffff;
+    padding: auto;
+    margin-top: 5px;
+}
+
 input{
     width: 50%;
     height: 2em;
