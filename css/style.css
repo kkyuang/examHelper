@@ -1,25 +1,19 @@
 @font-face {
-    font-family: 'montecarlo';
-    src: url('font/MonteCarlo-Regular.ttf');
-}
-@font-face {
-    font-family: 'nexon';
-    src: url('font/WEB_NEXON\ Lv1\ Gothic/NEXON Lv1 Gothic OTF Light.woff');
-}
-@font-face {
-    font-family: 'Gaegu';
-    src: url('font/Gaegu-Light.ttf');
+    font-family: 'NEXON Lv1 Gothic OTF Light';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/NEXON Lv1 Gothic OTF Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
 
 .main-btn{
     width: 50%;
     height: 2em;
     font-size: 1.5em;
+    color:black;
     border-radius: 1em;
     border-color: #556070;
     padding: auto;
     margin-top: 32px;
-    font-family: 'Gaegu', cursive;
 }
 
 body{

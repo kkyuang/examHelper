@@ -70,9 +70,28 @@ function chatSave(roomName, msgData){ //새 채팅 내용 저장
   fs.writeFileSync('data/' + roomName + '/' + fileName, JSON.stringify(chats))
   chatCountAppend(roomName)
 }
- 
+
+//메인
 app.get('/', function(request, response) {
   var html = readHTML('main')
+  response.send(html)
+});
+
+//객관식 모드
+app.get('/choice', function(request, response) {
+  var html = readHTML('choice')
+  response.send(html)
+});
+
+//주관식 모드
+app.get('/question', function(request, response) {
+  var html = readHTML('question')
+  response.send(html)
+});
+
+//랭킹
+app.get('/rank', function(request, response) {
+  var html = readHTML('rank')
   response.send(html)
 });
 
@@ -130,7 +149,9 @@ app.get('/css/:name', function(request, response) {
 app.get('/js/:name', function(request, response) {
   response.send(fs.readFileSync('js/' + request.params.name))
 });
- 
+
+//폰트 라우팅
+
 server.listen(80, function() {
   console.log('Example app listening on port 80!')
 });
