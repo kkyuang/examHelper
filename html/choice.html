@@ -17,7 +17,7 @@
     <script>
         //랜덤
         function rand(min, max) {
-          return Math.floor(Math.random() * (max - min)) + min;
+            return Math.floor(Math.random() * (max - min)) + min;
         }
 
         var nowQuestion = {}
@@ -38,56 +38,70 @@
         var nowNum = 0
 
         var correctAnswerNum
-        
+
         $(function () {
             $("#result-div").css("display", "none")
             wordsCount = words.length
             wordsCopy = words.slice()
             nowNum = 0
-            questionRefresh(nowNum)            
+            questionRefresh(nowNum)
         });
-        
+
 
         function test_end() {
-            $("#test-div").animate({
-                opacity: '0.0'
-            }, 800)
-            setTimeout(() => {
-                $("#test-div").css("display", "none")
-            }, 800);
-            $("#result-div").css("display", "block")
-            $("#result-div").css("opacity", "0.0")
-            $("#result-div").animate({
-                opacity: '1.0'
-            }, 800)
+            var CATR = Math.round((wordsCopy.length - wrongAnswers.length) / timeTotal * 100)
+            var sendDATA = {
+                CATR: CATR,
+                wrongAnswers: wrongAnswers,
+                userName: myname,
+                isReview: isReview
+            }
 
             //소켓통신
             socket = io()
-            socket.emit('top')
+            socket.emit('topCATRreq', sendDATA)
+            socket.on('topCATRres', (data) => {
 
-            //정답률
-            var CAR = (wordsCopy.length == 0 ? 1 :  (wordsCopy.length - wrongAnswers.length) / wordsCopy.length) * 100
-            $("#rCAR-bar-finished").animate({
-                width : (CAR + "%")
-            }, 800)
-            $("#rCAR-text").text(wordsCopy.length + '개 중 ' + (wordsCopy.length - wrongAnswers.length) + '개 정답, 정답률 ' + Math.round(CAR) + "%")
+                $("#test-div").animate({
+                    opacity: '0.0'
+                }, 800)
+                setTimeout(() => {
+                    $("#test-div").css("display", "none")
+                }, 800);
+                $("#result-div").css("display", "block")
+                $("#result-div").css("opacity", "0.0")
+                $("#result-div").animate({
+                    opacity: '1.0'
+                }, 800)
 
-            //경과시간
-            $("#rtime-bar-finished").animate({
-                width : ((timeTotal / (10 * wordsCopy.length) * 100 + "%"))
-            }, 800)
-            $("#rtime-text").text('최대 ' + 10 * wordsCopy.length + '초 중 ' + Math.round(timeTotal) + '초 만에 완료')
 
-            var CATR = Math.round((wordsCopy.length - wrongAnswers.length) / timeTotal * 100)
-            if(CATR > topCATR){
-                topCATR = CATR
-            }
+                //정답률
+                var CAR = (wordsCopy.length == 0 ? 1 : (wordsCopy.length - wrongAnswers.length) / wordsCopy.length) * 100
+                $("#rCAR-bar-finished").animate({
+                    width: (CAR + "%")
+                }, 800)
+                $("#rCAR-text").text(wordsCopy.length + '개 중 ' + (wordsCopy.length - wrongAnswers.length) + '개 정답, 정답률 ' + Math.round(CAR) + "%")
 
-            //정답 대 시간
-            $("#CATR-bar-finished").animate({
-                width : (CATR / topCATR) * 100 + "%"
-            }, 800)
-            $("#CATR-text").text('정답 대 시간 비율 ' + CATR + '(최고 ' + topCATR + ', ' + topCATRuser + '님)')
+                //경과시간
+                $("#rtime-bar-finished").animate({
+                    width: ((timeTotal / (10 * wordsCopy.length) * 100 + "%"))
+                }, 800)
+                $("#rtime-text").text('최대 ' + 10 * wordsCopy.length + '초 중 ' + Math.round(timeTotal) + '초 만에 완료')
+
+                
+                topCATR = data.topCATR
+                topCATRuser = data.topCATRuser
+                if (CATR > topCATR) {
+                    topCATR = CATR
+                    topCATRuser = myname
+                }
+
+                //정답 대 시간
+                $("#CATR-bar-finished").animate({
+                    width: (CATR / topCATR) * 100 + "%"
+                }, 800)
+                $("#CATR-text").text('정답 대 시간 비율 ' + CATR + '(최고 ' + topCATR + ', ' + topCATRuser + '님)')
+            })
         }
 
         //답
@@ -99,35 +113,36 @@
             clearTimeout(outTimer)
             $("#time-bar-finished").stop(true, false)
             $("#time-bar-finished").animate({
-                width : ("0")
+                width: ("0")
             }, 400)
 
             //문제 틀렸는지 판단
             isCorrect = false
-            if(number == correctAnswerNum){
+            if (number == correctAnswerNum) {
                 isCorrect = true
             }
             $(".answer-btn").css('background-color', '#eeeeee')
 
             //틀린 문제 추가, 정답여부 표시
-            if(!isCorrect){
+            if (!isCorrect) {
                 wrongAnswers[wrongAnswers.length] = nowQuestion
-                if(number != false){
+                if (number == 'timeOut') {
+                    console.log('ㅎㅇ')
+                    $('#answer-' + correctAnswerNum).css('background-color', '#aabbff')
+                }
+                else {
                     $('#answer-' + number).css('background-color', '#ffaabb')
                     $('#answer-' + correctAnswerNum).css('background-color', '#aaffbb')
                 }
-                else{
-                    $('#answer-' + correctAnswerNum).css('background-color', '#aabbff')
-                }
             }
-            else{
+            else {
                 $('#answer-' + number).css('background-color', '#aaffbb')
             }
 
             $(".answer-btn").attr("disabled", true)
             $(".answer-btn").css('color', '#000000')
 
-            
+
             //UI
 
             setTimeout(() => {
@@ -135,7 +150,7 @@
                     opacity: '0.0'
                 }, 400)
                 console.log(nowNum)
-                if(nowNum + 1 == wordsCopy.length){
+                if (nowNum + 1 == wordsCopy.length) {
                     clearTimeout(timer1234)
                     test_end()
                 }
@@ -149,11 +164,13 @@
                     opacity: '1.0'
                 }, 400)
                 $(".answer-btn").animate({
-                    backgroundColor: '#eeeeee',                    
+                    backgroundColor: '#eeeeee',
                     color: 'black'
                 }, 400)
-                $(".answer-btn").attr("disabled", false)
-                $("#back-btn").attr("disabled", false)
+                setTimeout(() => {
+                    $(".answer-btn").attr("disabled", false)
+                    $("#back-btn").attr("disabled", false)
+                }, 400)
             }, 1000)
         }
 
@@ -161,29 +178,29 @@
             var num = rand(0, words.length)
             nowQuestion = words[num]
             words.splice(num, 1);
-            
+
             //정답은 몇번에?
             correctAnswerNum = rand(0, 5)
 
             //문제 텍스트
             $("#question-text").text(nowQuestion.meaning)
             var chosenNums = []
-            for(var i = 0; i < 5; i++){
-                if(i != correctAnswerNum){
-                    for(;;){
+            for (var i = 0; i < 5; i++) {
+                if (i != correctAnswerNum) {
+                    for (; ;) {
                         chosenNums[chosenNums.length] = rand(0, wordsCopy.length)
                         isNotOverlap = true
-                        if(nowQuestion.id != wordsCopy[chosenNums[chosenNums.length - 1]].id){
-                            for(var j = 0; j < chosenNums.length - 1; j++){
-                                if(wordsCopy[chosenNums[j]].id == wordsCopy[chosenNums[chosenNums.length - 1]].id){
+                        if (nowQuestion.id != wordsCopy[chosenNums[chosenNums.length - 1]].id) {
+                            for (var j = 0; j < chosenNums.length - 1; j++) {
+                                if (wordsCopy[chosenNums[j]].id == wordsCopy[chosenNums[chosenNums.length - 1]].id) {
                                     isNotOverlap = false
                                 }
                             }
                         }
-                        else{
+                        else {
                             isNotOverlap = false
                         }
-                        if(isNotOverlap){
+                        if (isNotOverlap) {
                             break
                         }
                     }
@@ -193,9 +210,9 @@
             }
 
             //정답률 관련
-            var CAR = (n == 0 ? 1 :  (n - wrongAnswers.length) / n) * 100
+            var CAR = (n == 0 ? 1 : (n - wrongAnswers.length) / n) * 100
             $("#CAR-bar-finished").animate({
-                width : (CAR + "%")
+                width: (CAR + "%")
             }, 800)
             $("#CAR-text").text(Math.round(CAR) + "%")
             $("#progress-text").text((n + 1) + "/" + wordsCopy.length)
@@ -203,10 +220,12 @@
             //타이머 시작
             oldTime = new Date()
             $("#time-bar-finished").animate({
-                width : ("100%")
-            }, 10*1000, 'linear')
+                width: ("100%")
+            }, 10 * 1000, 'linear')
 
-            outTimer = setTimeout("answer(false)", 10*1000);
+            outTimer = setTimeout(() => {
+                answer('timeOut')
+            }, 10 * 1000);
         }
 
         $(function () {
@@ -267,7 +286,8 @@
 <body class="no-drag">
     <nav class="top-nav-bar">
         <a class="navbar-brand" href="/">2021 거창덕유중학교 고사성어 외우기</a>
-        <a class="navbar-brand" style="color: #808080" href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
+        <a class="navbar-brand" style="color: #808080"
+            href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
     </nav>
     <div id="test-div" class="pannel">
         <div class="top-bar">
@@ -277,7 +297,8 @@
                 <span id="CAR-text" style="margin-right: 10px;" class="progress-text">50%</span>
             </div>
             <div id="CAR-bar" class="progress-bar" style="text-align: center; background-color: #ffaabb">
-                <div id="CAR-bar-finished" style="width: 0%; background-color: #aaffbb;" class="progress-bar-finished"></div>
+                <div id="CAR-bar-finished" style="width: 0%; background-color: #aaffbb;" class="progress-bar-finished">
+                </div>
             </div>
             <div id="time-bar" style="background-color: #aaffbb;" class="progress-bar">
                 <div id="time-bar-finished" style="background-color: #ffaabb;" class="progress-bar-finished"></div>
@@ -300,16 +321,21 @@
     </div>
     <div id="result-div" class="pannel">
         <div class="top-category">
-            <h1 class="title" style="margin-top: 2em; margin-bottom: 0.2em; font-family: 'montecarlo', sans-serif; font-size: 1.5em" id="result-name">
+            <h1 class="title"
+                style="margin-top: 2em; margin-bottom: 0.2em; font-family: 'montecarlo', sans-serif; font-size: 1.5em"
+                id="result-name">
                 객관식 파트 ${num} 학습 완료
             </h1>
         </div>
-        <div class="bottom-descript" style="position:absolute; left: 50%; top: 50%; transform:translate(-50%, -50%); width: 100%;">
+        <div class="bottom-descript"
+            style="position:absolute; left: 50%; top: 50%; transform:translate(-50%, -50%); width: 100%;">
             <div class="top-bar" style="text-align: center;">
                 <span id="rCAR-text">50개 중 30개 정답, 정답률 60%</span>
                 <br>
-                <div id="rCAR-bar" class="progress-bar" style="text-align: center; margin-bottom: 16px; background-color: #ffaabb">
-                    <div id="rCAR-bar-finished" style="width: 0%; background-color: #aaffbb;" class="progress-bar-finished"></div>
+                <div id="rCAR-bar" class="progress-bar"
+                    style="text-align: center; margin-bottom: 16px; background-color: #ffaabb">
+                    <div id="rCAR-bar-finished" style="width: 0%; background-color: #aaffbb;"
+                        class="progress-bar-finished"></div>
                 </div>
                 <span id="rtime-text">최대 1500초 중 500초 만에 완료</span>
                 <br>
