@@ -6,6 +6,7 @@ var crypto = require('crypto');
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var session = require('express-session');
+const { json } = require('express');
 var FileStore = require('session-file-store')(session);
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -92,6 +93,10 @@ function makeHash(password, salt){
 function makeSalt(){
   return Math.round((new Date().valueOf() * Math.random())) + ""
 }
+//랜덤
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
 
 function newUserDir(){ 
   if(fs.existsSync('users')){
@@ -123,6 +128,25 @@ function openUser(UserID){
     return false
   }
 }
+function newChoice(uid){
+    //처음 하는것인가요?
+    if(!fs.existsSync(`users/${uid}/choice`)){
+      fs.mkdirSync(`users/${uid}/choice`)
+      var words = JSON.parse(fs.readFileSync('js/data.json', 'utf-8'));
+      var wordsMungtange = []
+      //5개의 뭉탱이
+      for(var i = 0; i < 5; i++){
+        wordsMungtange[i] = []
+        for(var j = 0; j < (words.length / (5 - i)); j++){
+          var num = rand(0, words.length)
+          wordsMungtange[i][j] = words[num]
+          words.splice(num, 1);
+        }
+        //파일저장
+        fs.writeFileSync(`users/${uid}/choice/${i}.json`, JSON.stringify(wordsMungtange[i]))
+      }
+    }
+}
 
 
 //메인
@@ -147,18 +171,31 @@ app.get('/login', function(req, response) {
 });
 
 //객관식 모드
-app.get('/choice', function(request, response) {
-  var html = readHTML('choice')
+app.get('/choice-prepare', function(request, response) {
+  if(request.session.logined == true){
+    //초기 설정
+    uid = request.session.user_id
+    newChoice(uid)
+    var html = readHTML('choice-prepare').replace('로그인하지 않음', request.session.user_id)
+  }
+  else{
+    var html = readHTML('choice-prepare') + '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+    response.redirect('/')
+  }
   response.send(html)
 });
 
 //객관식 모드
-app.get('/choice-prepare', function(request, response) {
+app.get('/choice/:num', function(request, response) {
   if(request.session.logined == true){
-    var html = readHTML('choice-prepare')
+    //초기 설정
+    uid = request.session.user_id
+    newChoice(uid)
+    var html = readHTML('choice').replace('${num}', ((request.params.num * 1) + 1)) + `<script>var words=${fs.readFileSync(`users/${uid}/choice/${request.params.num}.json`, 'utf-8')} vaar myname = ${request.session.user_id}</script>`
   }
   else{
-    var html = readHTML('choice-prepare') + '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+    var html = readHTML('choice') + '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+    response.redirect('/')
   }
   response.send(html)
 });
