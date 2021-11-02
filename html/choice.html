@@ -59,8 +59,8 @@
 
             //소켓통신
             socket = io()
-            socket.emit('topCATRreq', sendDATA)
-            socket.on('topCATRres', (data) => {
+            socket.emit('topCATRreq-choice', sendDATA)
+            socket.on('topCATRres-choice', (data) => {
 
                 $("#test-div").animate({
                     opacity: '0.0'

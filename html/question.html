@@ -7,153 +7,207 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="http://fonts.googleapis.com/earlyaccess/notosanskr.css" rel="stylesheet">
-    <title>나에게 어울리는 영어 단어는?</title>
-    <meta name="title" content="나에게 어울리는 영어 단어는?">
-    <meta name="subject" content="당신에게 어울리는 영어 단어를 찾아드립니다 ;) - MBTI 기반 영어 단어 성격테스트">
-    <meta name="keywords" content="MBTI,성격테스트,영어단어,영어,단어,성격,테스트">
+    <title>주관식 모드</title>
+    <meta name="title" content="2021 거창덕유중학교 고사성어 외우기">
     <meta name="author" content="뀨앙지윤">
-    <link rel="stylesheet" href="style.css">
-    <link rel="canonical" href="https://kkyuang.github.io/eng-word-mbti" />
-    <meta property="og:url" content="https://kkyuang.github.io/eng-word-mbti" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="나에게 어울리는 영어 단어는?" />
-    <meta property="og:description" content="당신에게 어울리는 영어 단어를 찾아드립니다 ;) - MBTI 기반 영어 단어 성격테스트" />
-    <meta property="og:image" content="https://i.ibb.co/BCMFHp2/img.png"></a>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <script type="text/javascript" src="data.js"></script>
-    <meta name="google-site-verification" content="AOYdMvmso3-qCALEYplV_sXqJS83q9MP_nundQB5r_s" />
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8WKB5KSJG"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <meta property="og:title" content="2021 거창덕유중학교 고사성어 외우기" />
+    <meta property="og:description" content="고사성어를 쉽게 외울 수 있는 웹사이트입니다 :)" />
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
+        //랜덤
+        function rand(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
 
-        gtag('config', 'G-X8WKB5KSJG');
-    </script>
-    <script>
-        $(document).ready(function () {
+        var nowQuestion = {}
+        var wordsCopy = []
+
+        var wrongAnswers = []
+        var outTimer
+
+        var timer1234
+        var timeTotal = 0
+
+        var oldTime = 0
+
+        var topCATR = 1
+        var topCATRuser = ''
+
+        //몇번째 문제?
+        var nowNum = 0
+
+        var correctAnswerNum
+
+        $(function () {
             $("#result-div").css("display", "none")
-            $("#test-div").css("display", "none")
+            wordsCount = words.length
+            wordsCopy = words.slice()
+            nowNum = 0
+            questionRefresh(nowNum)
+            $("#answer-input").keydown((key) => {
+                if(key.keyCode == 13){
+                    answer(0)
+                }
+            })
         });
 
-        function test_start() {
-            questionRefresh(0)
-            $("#main-div").animate({
-                opacity: '0.0'
-            }, 800)
-            setTimeout(() => {
-                $("#main-div").css("display", "none")
-            }, 800);
-            $("#test-div").css("display", "block")
-            $("#test-div").css("opacity", "0.0")
-            $("#test-div").animate({
-                opacity: '1.0'
-            }, 800)
-        }
 
         function test_end() {
-            $("#test-div").animate({
-                opacity: '0.0'
-            }, 800)
-            $("#ad").animate({
-                opacity: '0.0'
-            }, 800)
-            setTimeout(() => {
-                $("#test-div").css("display", "none")
-                $("#ad").css("display", "none")
-            }, 800);
-            $("#result-div").css("display", "block")
-            $("#result-div").css("opacity", "0.0")
-            $("#result-div").animate({
-                opacity: '1.0'
-            }, 800)
+            var CATR = Math.round((wordsCopy.length - wrongAnswers.length) / timeTotal * 100)
+            var sendDATA = {
+                CATR: CATR,
+                wrongAnswers: wrongAnswers,
+                userName: myname,
+                isReview: isReview
+            }
 
-            //결과도출
+            //소켓통신
+            socket = io()
+            socket.emit('topCATRreq-question', sendDATA)
+            socket.on('topCATRres-question', (data) => {
 
-            var mbti = ''
-            mbti += weight['I'] > weight['E'] ? 'I' : 'E'
-            mbti += weight['N'] > weight['S'] ? 'N' : 'S'
-            mbti += weight['T'] > weight['F'] ? 'T' : 'F'
-            mbti += weight['P'] > weight['J'] ? 'P' : 'J'
+                $("#test-div").animate({
+                    opacity: '0.0'
+                }, 800)
+                setTimeout(() => {
+                    $("#test-div").css("display", "none")
+                }, 800);
+                $("#result-div").css("display", "block")
+                $("#result-div").css("opacity", "0.0")
+                $("#result-div").animate({
+                    opacity: '1.0'
+                }, 800)
 
-            $("#result-name").text(returnMBTI(mbti, 'name'))
-            document.getElementById("result-text").innerHTML = returnMBTI(mbti, 'descript').replace(/\n/gi, "<br>");
-            $("#good-category-text").text(returnMBTI(returnMBTI(mbti, 'good'), 'name'))
-            $("#bad-category-text").text(returnMBTI(returnMBTI(mbti, 'bad'), 'name'))
-            $("#result-korean").text(returnMBTI(mbti, 'korean'))
+
+                //정답률
+                var CAR = (wordsCopy.length == 0 ? 1 : (wordsCopy.length - wrongAnswers.length) / wordsCopy.length) * 100
+                $("#rCAR-bar-finished").animate({
+                    width: (CAR + "%")
+                }, 800)
+                $("#rCAR-text").text(wordsCopy.length + '개 중 ' + (wordsCopy.length - wrongAnswers.length) + '개 정답, 정답률 ' + Math.round(CAR) + "%")
+
+                //경과시간
+                $("#rtime-bar-finished").animate({
+                    width: ((timeTotal / (30 * wordsCopy.length) * 100 + "%"))
+                }, 800)
+                $("#rtime-text").text('최대 ' + 30 * wordsCopy.length + '초 중 ' + Math.round(timeTotal) + '초 만에 완료')
+
+                
+                topCATR = data.topCATR
+                topCATRuser = data.topCATRuser
+                if (CATR > topCATR) {
+                    topCATR = CATR
+                    topCATRuser = myname
+                }
+
+                //정답 대 시간
+                $("#CATR-bar-finished").animate({
+                    width: (CATR / topCATR) * 100 + "%"
+                }, 800)
+                $("#CATR-text").text('정답 대 시간 비율 ' + CATR + '(최고 ' + topCATR + ', ' + topCATRuser + '님)')
+            })
         }
 
-        function returnMBTI(mbti, key) {
-            return MBTIs[mbti[0]][mbti[1]][mbti[2]][mbti[3]][key]
-        }
+        //답
+        function answer(number) {
 
-        //몇번째 문제니?
-        var nowNum = 0;
+            answerInputText = $('#answer-input').val()
 
-        //가중치
-        var weight = {
-            'I': 0,
-            'N': 0,
-            'T': 0,
-            'P': 0,
+            //타이머 끝
+            nowTime = new Date()
+            timeTotal += (nowTime - oldTime) / 1000
+            clearTimeout(outTimer)
+            $("#time-bar-finished").stop(true, false)
+            $("#time-bar-finished").animate({
+                width: ("0")
+            }, 400)
 
-            'E': 0,
-            'S': 0,
-            'F': 0,
-            'J': 0
-        }
+            //문제 틀렸는지 판단
+            isCorrect = false
+            if (answerInputText == nowQuestion.word) {
+                isCorrect = true
+            }
+            $(".answer-btn").css('background-color', '#eeeeee')
 
-        //뒤로가기 대비
-        var beforeFixed = ''
-
-        function answer(isPositive) {
-            if (isPositive == 'back') {
-                nowNum--
-                weight[beforeFixed]--
-                if (nowNum == -1) {
-                    window.location.href = ""
+            //틀린 문제 추가, 정답여부 표시
+            if (!isCorrect) {
+                wrongAnswers[wrongAnswers.length] = nowQuestion
+                if (number == 'timeOut') {
+                    console.log('ㅎㅇ')
+                    $('#answer-input').css('background-color', '#aabbff')
+                    $('#answer-input').val(nowQuestion.word)
+                }
+                else {
+                    $('#answer-input').css('background-color', '#ffaabb')
+                    $('#answer-input').val(nowQuestion.word)
                 }
             }
             else {
-                //기능
-                weight[questions[nowNum]['answers'][isPositive]['value']]++
-                beforeFixed = questions[nowNum]['answers'][isPositive]['value']
-                nowNum++
-                if (nowNum == questions.length) {
-                    test_end()
-                    return
-                }
+                $('#answer-input').css('background-color', '#aaffbb')
             }
 
-            //UI
-            $(".answer").animate({
-                opacity: '0.0'
-            }, 400)
             $(".answer-btn").attr("disabled", true)
-            $("#back-btn").attr("disabled", true)
-            $("#back-btn").css('color', 'black')
+            $(".answer-btn").css('color', '#000000')
+
+
+            //UI
 
             setTimeout(() => {
+                $(".answer").animate({
+                    opacity: '0.0'
+                }, 400)
+                console.log(nowNum)
+                if (nowNum + 1 == wordsCopy.length) {
+                    clearTimeout(timer1234)
+                    test_end()
+                }
+            }, 600)
+
+            timer1234 = setTimeout(() => {
                 //여기서 질문 바꾸자!
+                nowNum++
                 questionRefresh(nowNum)
                 $(".answer").animate({
                     opacity: '1.0'
                 }, 400)
-                $(".answer-btn").attr("disabled", false)
-                $("#back-btn").attr("disabled", false)
-            }, 400)
+                $(".answer-btn").animate({
+                    backgroundColor: '#eeeeee',
+                    color: 'black'
+                }, 400)
+                setTimeout(() => {
+                    $(".answer-btn").attr("disabled", false)
+                    $("#back-btn").attr("disabled", false)
+                }, 400)
+            }, 1000)
         }
 
         function questionRefresh(n) {
-            $("#question-text").text(questions[n]['question'])
-            $("#answer-0").text(questions[n]['answers'][true]['text'])
-            $("#answer-1").text(questions[n]['answers'][false]['text'])
-            $("#progress-bar-finished").animate({
-                width : (((n + 1) / questions.length) * 100) + "%"
+            var num = rand(0, words.length)
+            nowQuestion = words[num]
+            words.splice(num, 1);
+
+            //문제 텍스트
+            $("#question-text").text(nowQuestion.meaning)
+            $('#answer-input').val('')
+
+            //정답률 관련
+            var CAR = (n == 0 ? 1 : (n - wrongAnswers.length) / n) * 100
+            $("#CAR-bar-finished").animate({
+                width: (CAR + "%")
             }, 800)
-            $("#progress-text").text((n + 1) + "/" + questions.length)
+            $("#CAR-text").text(Math.round(CAR) + "%")
+            $("#progress-text").text((n + 1) + "/" + wordsCopy.length)
+
+            //타이머 시작
+            oldTime = new Date()
+            $("#time-bar-finished").animate({
+                width: ("100%")
+            }, 30 * 1000, 'linear')
+
+            outTimer = setTimeout(() => {
+                answer('timeOut')
+            }, 30 * 1000);
         }
 
         $(function () {
@@ -168,12 +222,6 @@
                     'white',
                     '#556070',
                     'white',
-                    'black'
-                ],
-                '.answer-btn': [
-                    '#057cfe',
-                    'white',
-                    '#eeeeee',
                     'black'
                 ],
                 '.retry-btn': [
@@ -214,88 +262,75 @@
                 });
             }
         })
-        function clipBoard(Link) {
-            // 글을 쓸 수 있는 란을 만든다.
-            var aux = document.createElement("input");
-            // 지정된 요소의 값을 할당 한다.
-            aux.setAttribute("value", Link);
-            // body에 추가.
-            document.body.appendChild(aux);
-            // 지정된 내용을 강조한다.
-            aux.select();
-            // 텍스트를 카피 하는 변수를 생성
-            document.execCommand("copy");
-            // body 로 부터 다시 반환 한다.
-            document.body.removeChild(aux);
-            //alert(aux.value);
-            alert("링크가 복사되었습니다! 친구들에게 공유하세요!");
-        }
     </script>
 </head>
 
 <body class="no-drag">
     <nav class="top-nav-bar">
-        <a class="navbar-brand" href="https://kkyuang.github.io/eng-word-mbti">2021 거창덕유중학교 고사성어 외우기</a>
-        <a class="navbar-brand" style="color: #808080" href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
+        <a class="navbar-brand" href="/">2021 거창덕유중학교 고사성어 외우기</a>
+        <a class="navbar-brand" style="color: #808080"
+            href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
     </nav>
-    <div id="main-div" class="pannel">
-        <h1 class="title" style="font-size: 1.5em; height: 2em; margin-top: 1.5em;">나에게 어울리는 영어 단어는?</h1>
-        <!--<img id="main-img" src="img/main-img.png" alt="메인 이미지">-->
-        <img id="main-img" src="img/main-img.png" alt="메인 이미지">
-        <br>
-        <button class="start-btn" onclick="test_start()">시작하기 🚀</button>
-    </div>
     <div id="test-div" class="pannel">
         <div class="top-bar">
             <div id="up">
-                <button id="back-btn" onclick="answer('back')">← 뒤로가기</button>
-                <span id="progress-text">1/12</span>
+                <button id="back-btn" onclick="location.href='/question-prepare'">← 주관식 모드</button>
+                <span id="progress-text" class="progress-text">1/12</span>
+                <span id="CAR-text" style="margin-right: 10px;" class="progress-text">50%</span>
             </div>
-            <div id="progress-bar">
-                <div id="progress-bar-finished"></div>
+            <div id="CAR-bar" class="progress-bar" style="text-align: center; background-color: #ffaabb">
+                <div id="CAR-bar-finished" style="width: 0%; background-color: #aaffbb;" class="progress-bar-finished">
+                </div>
+            </div>
+            <div id="time-bar" style="background-color: #aaffbb;" class="progress-bar">
+                <div id="time-bar-finished" style="background-color: #ffaabb;" class="progress-bar-finished"></div>
             </div>
         </div>
         <div class="question">
             <div class="question-text">
                 <span id="question-text">
-                    당신은 ~한가요?
+                    많으면 많을수록 좋다
                 </span>
             </div>
         </div>
         <div class="answer">
-            <button class="answer-btn" onclick="answer(true)" id="answer-0">예 ~합니다</button>
-            <button class="answer-btn" onclick="answer(false)" id="answer-1">아니요 ~하지 않습니다</button>
+            <input type="text" class="answer-btn" id="answer-input" style="text-align: center;" placeholder="여기에 입력">
+            <button class="answer-btn" onclick="answer(0)">제출</button>
         </div>
     </div>
-    <div id="result-div" class="pannel" style="height: auto; top: 6.25%; left: 50%; transform: translate(-50%, 0);">
+    <div id="result-div" class="pannel">
         <div class="top-category">
-            <h1 class="title" style="margin-bottom: 0.2em; font-family: 'montecarlo', sans-serif; font-size: 3em" id="result-name">
-                고양이
+            <h1 class="title"
+                style="margin-top: 2em; margin-bottom: 0.2em; font-family: 'montecarlo', sans-serif; font-size: 1.5em"
+                id="result-name">
+                주관식 파트 ${num} 학습 완료
             </h1>
-            <span id="result-korean">
-            </span>
         </div>
-        <div class="bottom-descript">
-            <span id="result-text">
-            </span>
-            <div class="compatibility">
-                <div id="good" class="part">
-                    <span id="good-category-explain" style="font-size: 1em;">잘 맞아요 🙂</span>
-                    <br>
-                    <span id="good-category-text" style="font-size: 1.2em; font-family: 'montecarlo', sans-serif;">고양이1</span>
+        <div class="bottom-descript"
+            style="position:absolute; left: 50%; top: 50%; transform:translate(-50%, -50%); width: 100%;">
+            <div class="top-bar" style="text-align: center;">
+                <span id="rCAR-text">50개 중 30개 정답, 정답률 60%</span>
+                <br>
+                <div id="rCAR-bar" class="progress-bar"
+                    style="text-align: center; margin-bottom: 16px; background-color: #ffaabb">
+                    <div id="rCAR-bar-finished" style="width: 0%; background-color: #aaffbb;"
+                        class="progress-bar-finished"></div>
                 </div>
-                <div id="bad" class="part">
-                    <span id="bad-category-explain" style="font-size: 1em;">안 맞아요 🙁</span>
-                    <br>
-                    <span id="bad-category-text" style="font-size: 1.2em; font-family: 'montecarlo', sans-serif;">고양이2</span>
+                <span id="rtime-text">최대 1500초 중 500초 만에 완료</span>
+                <br>
+                <div id="rtime-bar" style="background-color: #aaffbb;  margin-bottom: 16px; " class="progress-bar">
+                    <div id="rtime-bar-finished" style="background-color: #ffaabb;" class="progress-bar-finished"></div>
+                </div>
+                <span id="CATR-text">정답 대 시간 비율 6(최고 10)</span>
+                <br>
+                <div id="CATR-bar" style="background-color: #ffaabb; margin-bottom: 32px;" class="progress-bar">
+                    <div id="CATR-bar-finished" style="background-color: #aaffbb;" class="progress-bar-finished"></div>
                 </div>
             </div>
+            <button class="retry-btn" onclick="window.location.href='/question-prepare'">다시 하기 🔄</button>
+            <button class="retry-btn" onclick="window.location.href='/question/review'">틀린 문제 복습</button>
         </div>
-        <button class="share-btn" onclick="clipBoard('https://kkyuang.github.io/eng-word-mbti')">링크 복사 📋</button>
-        <button class="retry-btn" onclick="window.location.href=''">다시 하기 🔄</button>
-        <a href="./withpeople.html" style="display:block; margin-bottom: 2em;">도움을 주신 분들/주의사항</a>
     </div>
-    <iframe width="320" id="ad" style="position: absolute; bottom: 0; left: 50%; transform: translate(-50%, 0);" height="50" allowtransparency="true" src="https://mtab.clickmon.co.kr/pop/wp_m_320.php?PopAd=CM_M_1003067%7C%5E%7CCM_A_1025729%7C%5E%7CAdver_M_1046207&mon_rf=REFERRER_URL" frameborder="0" scrolling="no"></iframe>
 </body>
 
 </html>

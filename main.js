@@ -154,7 +154,7 @@ function saveReview(uid, wrongAnswers){
     fs.writeFileSync(`users/${uid}/choice/review.json`, JSON.stringify(wrongAnswers))
   }
   else{
-    var oldWrongAnswers = fs.readFileSync(`users/${uid}/choice/review.json`, 'utf-8')
+    var oldWrongAnswers = JSON.parse(fs.readFileSync(`users/${uid}/choice/review.json`, 'utf-8'))
     var newWrongAnswers = oldWrongAnswers.concat(wrongAnswers)
     Array.from(new Set(newWrongAnswers))
     fs.writeFileSync(`users/${uid}/choice/review.json`, JSON.stringify(newWrongAnswers))
@@ -247,7 +247,7 @@ function saveChoiceRank(uid, CATR){
     }
     //정렬 
     ranks.sort(function (a, b) { 
-      return a.CATR < b.CATR ? -1 : a.CATR > b.CATR ? 1 : 0;  
+      return a.CATR > b.CATR ? -1 : a.CATR < b.CATR ? 1 : 0;  
     });
     fs.writeFileSync(`data/choice/rank.json`, JSON.stringify(ranks))
   }
@@ -266,6 +266,124 @@ function getChoiceRank(rank){
     return ranks[rank]
   }
 }
+
+
+//주관식 전용
+function saveReviewQ(uid, wrongAnswers){
+  //처음 하는것인가요?
+  if(!fs.existsSync(`users/${uid}/question`)){
+    fs.mkdirSync(`users/${uid}/question`)
+  }
+  if(!fs.existsSync(`users/${uid}/question/review.json`)){
+    //파일저장
+    fs.writeFileSync(`users/${uid}/question/review.json`, JSON.stringify(wrongAnswers))
+  }
+  else{
+    var oldWrongAnswers = JSON.parse(fs.readFileSync(`users/${uid}/question/review.json`, 'utf-8'))
+    var newWrongAnswers = oldWrongAnswers.concat(wrongAnswers)
+    Array.from(new Set(newWrongAnswers))
+    fs.writeFileSync(`users/${uid}/question/review.json`, JSON.stringify(newWrongAnswers))
+  }
+}
+
+function setReviewQ(uid, wrongAnswers){
+  //처음 하는것인가요?
+  if(!fs.existsSync(`users/${uid}/question`)){
+    fs.mkdirSync(`users/${uid}/question`)
+  }
+  if(!fs.existsSync(`users/${uid}/question/review.json`)){
+    //파일저장
+    fs.writeFileSync(`users/${uid}/question/review.json`, JSON.stringify(wrongAnswers))
+  }
+  else{
+    var newWrongAnswers = wrongAnswers
+    fs.writeFileSync(`users/${uid}/question/review.json`, JSON.stringify(newWrongAnswers))
+  }
+}
+
+function saveQuestionRecord(uid, CATR){
+  //처음 하는것인가요?
+  if(!fs.existsSync(`users/${uid}/question/record.json`)){
+    //파일저장
+    data = {
+      CATR:CATR
+    }
+    fs.writeFileSync(`users/${uid}/question/record.json`, JSON.stringify(data))
+  }
+  else{
+    record = JSON.parse(fs.readFileSync(`users/${uid}/question/record.json`, 'utf-8')).CATR
+    if(record < CATR){
+      //파일저장
+      data = {
+        CATR:CATR
+      }
+      fs.writeFileSync(`users/${uid}/question/record.json`, JSON.stringify(data))
+    }
+  }
+}
+
+function saveQuestionRank(uid, CATR){
+  //처음 하는것인가요?
+  if(!fs.existsSync(`data/question/rank.json`)){
+    fs.mkdirSync('data/question')
+    //파일저장
+    data = [
+      {
+        CATR: CATR,
+        user_id:uid
+      }
+    ]
+    fs.writeFileSync(`data/question/rank.json`, JSON.stringify(data))
+  }
+  else{
+    ranks = JSON.parse(fs.readFileSync(`data/question/rank.json`, 'utf-8'))
+
+    function isSameMe(element){
+      if(element.user_id == uid){
+        return true
+      }
+    }
+    
+    //내 예전기록이 있는지?
+    var sameMe = ranks.indexOf(ranks.find(isSameMe))
+    //있고 그 기록이 지금보다 작으면 새로 고침
+    if(sameMe != -1){
+      if(ranks[sameMe].CATR < CATR){
+        ranks[sameMe].CATR = CATR
+      }
+    }
+    else{ //없으면 새로 추가
+      ranks[ranks.length] = 
+      {
+        CATR: CATR,
+        user_id:uid
+      }
+    }
+    //정렬 
+    ranks.sort(function (a, b) { 
+      return a.CATR > b.CATR ? -1 : a.CATR < b.CATR ? 1 : 0;  
+    });
+    fs.writeFileSync(`data/question/rank.json`, JSON.stringify(ranks))
+  }
+}
+
+function getQuestionRank(rank){
+  //처음 하는것인가요?
+  if(!fs.existsSync(`data/question/rank.json`)){
+    return {
+      CATR:0,
+      user_id:null
+    }
+  }
+  else{
+    ranks = JSON.parse(fs.readFileSync(`data/question/rank.json`, 'utf-8'))
+    return ranks[rank]
+  }
+}
+
+
+
+
 
 
 //메인
@@ -318,18 +436,21 @@ app.get('/choice/:num', function(request, response) {
       reviewVariable = 'var isReview = true'
       if(fs.existsSync(`users/${uid}/choice/review.json`)){
         if(JSON.parse(fs.readFileSync(`users/${uid}/choice/review.json`, 'utf-8')).length == 0){
-          var html = readHTML('choice') + '<script>alert("틀린 문제를 모두 복습했습니다 :)"); location.replace("/choice-prepare")</script>'
+          var html = readHTML('choice') + `<script>alert("틀린 문제를 모두 복습했습니다 :)"); location.replace("/choice-prepare")</script>`
           isNormal = false
         }
       }
       else{
         isNormal = false
-        var html = readHTML('choice') + '<script>alert("먼저 객관식 파트를 학습해 주세요"); location.replace("/choice-prepare")</script>'
+        var html = readHTML('choice') + `<script>alert("먼저 객관식 파트를 학습해 주세요"); location.replace("/choice-prepare") </script>`
       }
+    }
+    else{
+      reviewVariable = 'var isReview = false'
     }
 
     if(isNormal){
-      var html = readHTML('choice').replace('${num}', stageName) + `<script>var words=${fs.readFileSync(`users/${uid}/choice/${request.params.num}.json`, 'utf-8')}; var myname = '${request.session.user_id}; ${reviewVariable}'</script>`
+      var html = readHTML('choice').replace('${num}', stageName) + `<script>var words=${fs.readFileSync(`users/${uid}/choice/${request.params.num}.json`, 'utf-8')}; var myname = '${request.session.user_id}'; ${reviewVariable};</script>`
     }
   }
   else{
@@ -339,10 +460,64 @@ app.get('/choice/:num', function(request, response) {
 });
 
 //주관식 모드
-app.get('/question', function(request, response) {
-  var html = readHTML('question')
+app.get('/question-prepare', function(request, response) {
+  if(request.session.logined == true){
+    //초기 설정
+    uid = request.session.user_id
+    newChoice(uid)
+    var html = readHTML('question-prepare').replace('로그인하지 않음', request.session.user_id)
+  }
+  else{
+    var html = readHTML('question-prepare') + '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+  }
   response.send(html)
 });
+
+//주관식 모드
+app.get('/question/:num', function(request, response) {
+  if(request.session.logined == true){
+    //초기 설정
+    uid = request.session.user_id
+    newChoice(uid)
+    var stageName = ((request.params.num * 1) + 1)
+
+    isNormal = true
+    reviewVariable = ''
+    if(request.params.num == 'review'){
+      stageName = '틀린 문제 복습'
+      reviewVariable = 'var isReview = true'
+      if(!fs.existsSync(`users/${uid}/question`)){
+        fs.mkdirSync(`users/${uid}/question`)
+      }
+      if(fs.existsSync(`users/${uid}/question/review.json`)){
+        if(JSON.parse(fs.readFileSync(`users/${uid}/question/review.json`, 'utf-8')).length == 0){
+          var html = readHTML('question') + `<script>alert("틀린 문제를 모두 복습했습니다 :)"); location.replace("/question-prepare")</script>`
+          isNormal = false
+        }
+      }
+      else{
+        isNormal = false
+        var html = readHTML('question') + `<script>alert("먼저 주관식 파트를 학습해 주세요"); location.replace("/question-prepare") </script>`
+      }
+    }
+    else{
+      reviewVariable = 'var isReview = false'
+    }
+
+    if(isNormal){
+      var path = 'choice'
+      if(request.params.num == 'review'){
+        path = 'question'
+      }
+      var html = readHTML('question').replace('${num}', stageName) + `<script>var words=${fs.readFileSync(`users/${uid}/${path}/${request.params.num}.json`, 'utf-8')}; var myname = '${request.session.user_id}'; ${reviewVariable};</script>`
+    }
+  }
+  else{
+    var html = readHTML('question') + '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+  }
+  response.send(html)
+});
+
 
 //랭킹
 app.get('/rank', function(request, response) {
@@ -400,7 +575,7 @@ app.post("/login", function(req,res,next){
 
 //소켓 통신
 io.on('connection', (socket) => {
-  socket.on('topCATRreq', (data)=>{
+  socket.on('topCATRreq-choice', (data)=>{
     //사용자 기록 저장하기
     saveReview(data.userName, data.wrongAnswers)
     saveChoiceRecord(data.userName, data.CATR)
@@ -410,9 +585,25 @@ io.on('connection', (socket) => {
     }
 
     //다시 보내주기
-    socket.emit('topCATRres', {
+    socket.emit('topCATRres-choice', {
       topCATR: getChoiceRank(0).CATR,
       topCATRuser: getChoiceRank(0).user_id
+    })
+  })
+
+  socket.on('topCATRreq-question', (data)=>{
+    //사용자 기록 저장하기
+    saveReviewQ(data.userName, data.wrongAnswers)
+    saveQuestionRecord(data.userName, data.CATR)
+    saveQuestionRank(data.userName, data.CATR)
+    if(data.isReview == true){
+      setReviewQ(data.userName, data.wrongAnswers)
+    }
+
+    //다시 보내주기
+    socket.emit('topCATRres-question', {
+      topCATR: getQuestionRank(0).CATR,
+      topCATRuser: getQuestionRank(0).user_id
     })
   })
 
