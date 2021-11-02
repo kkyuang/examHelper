@@ -527,7 +527,7 @@ app.get('/rank', function(request, response) {
 
 //채팅 서비스 이용
 app.get('/chat', function(request, response) {
-    var html = readHTML('chat')
+    var html = readHTML('chat') + `<script>var myname = '${request.session.logined ? request.session.user_id : '익명'}'</script>`
     response.send(html)
 });
 

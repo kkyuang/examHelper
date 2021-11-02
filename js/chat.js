@@ -46,7 +46,7 @@ function sendChat(socket){
 
 $(document).ready(() => {
     //초기 닉네임 설정
-    $("#name-input").val('익명')
+    $("#name-input").val(myname)
     //소켓서버열기
     var socket = io();
 
