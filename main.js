@@ -26,7 +26,7 @@ function readHTML(name){ //html 읽기
     return html
 }
 function removeTag(text){ //태그 지우기
-  return text.replaceAll('<', '&lt').replaceAll('>', '&gt')
+  return text.replace(/</gi, '&lt').replace(/>/gi, '&gt')
 }
 function chatCount(roomName){ //채팅수 확인
   newChatRoom(roomName)
@@ -655,6 +655,6 @@ app.get('/js/:name', function(request, response) {
 });
 
 //폰트 라우팅
-server.listen(80, function() {
-  console.log('Example app listening on port 80!')
+server.listen(3000, function() {
+  console.log('Example app listening on port 3000!')
 });
