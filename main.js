@@ -137,7 +137,8 @@ function newChoice(uid){
       //5개의 뭉탱이
       for(var i = 0; i < 5; i++){
         wordsMungtange[i] = []
-        for(var j = 0; j < (words.length / (5 - i)); j++){
+        var nowLength = words.length 
+        for(var j = 0; j < (nowLength / (5 - i)); j++){
           var num = rand(0, words.length)
           wordsMungtange[i][j] = words[num]
           words.splice(num, 1);
