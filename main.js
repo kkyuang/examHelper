@@ -408,8 +408,46 @@ app.get('/login', function(req, response) {
   }
 });
 
+//과목선택
+app.get('/subject-selection', function(request, response) {
+  if(request.session.logined == true){
+    //초기 설정
+    uid = request.session.user_id
+    newChoice(uid)
+    var html = readHTML('subject-selection').replace('로그인하지 않음', request.session.user_id)
+  }
+  else{
+    var html = '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+  }
+  response.send(html)
+});
+
+//과목준비
+app.get('/prepare/:subject', function(request, response) {
+  var subjectList = {
+    korean : '국어',
+    english : "영어",
+    social : "사회",
+    history : "역사",
+    science : "과학"
+  }
+  if(!(request.params.subject in subjectList)){
+    var html = '<script>alert("얘 그런 과목은 없단다 배먹어배"); location.replace("/")</script>'
+  }
+  else if(request.session.logined == true){
+    //초기 설정
+    uid = request.session.user_id
+    newChoice(uid)
+    var html = readHTML('subject-prepare').replace('로그인하지 않음', request.session.user_id).replace(/{subject}/gi, request.params.subject).replace(/{subject-ko}/gi, subjectList[request.params.subject])
+  }
+  else{
+    var html = '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+  }
+  response.send(html)
+});
+
 //객관식 모드
-app.get('/choice-prepare', function(request, response) {
+app.get('/choice-prepare/:subject', function(request, response) {
   if(request.session.logined == true){
     //초기 설정
     uid = request.session.user_id
@@ -417,13 +455,13 @@ app.get('/choice-prepare', function(request, response) {
     var html = readHTML('choice-prepare').replace('로그인하지 않음', request.session.user_id)
   }
   else{
-    var html = readHTML('choice-prepare') + '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
+    var html = '<script>alert("먼저 로그인 해 주세요"); location.replace("/")</script>'
   }
   response.send(html)
 });
 
 //객관식 모드
-app.get('/choice/:num', function(request, response) {
+app.get('/choice/:subject/:num', function(request, response) {
   if(request.session.logined == true){
     //초기 설정
     uid = request.session.user_id

@@ -21,6 +21,12 @@
                     'white',
                     'white',
                     'black'
+                ],
+                '.list-btn': [
+                    '#556070',
+                    'white',
+                    'white',
+                    'black'
                 ]
             }
             for (var i = 0; i < Object.keys(effectList).length; i++) {
@@ -57,15 +63,13 @@
         <a class="navbar-brand" style="color: #808080" href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
     </nav>
     <div id="main-div" class="pannel">
-        <h1 class="title" style="font-size: 42px; height: 2em; margin-top: 1.5em;">본격 암기과목 외우기</h1>
+        <h1 class="title" style="font-size: 42px; height: 2em; margin-top: 1.5em;">{subject-ko}</h1>
         <!--<img id="main-img" src="img/main-img.png" alt="메인 이미지">-->
         <br>
         <div style="position:absolute; left: 50%; top: 50%; transform:translate(-50%, -50%); width: 100%;">
             <h3>로그인하지 않음 님</h3>
-            <button class="main-btn" onclick="location.href='/login'" style="margin-top: 0;">로그인 ←</button>
-            <button class="main-btn" onclick="location.href='/subject-selection'">과목 선택 📖</button>
-            <!---<button class="main-btn" onclick="location.href='/rank'">랭킹 보기 🥇</button>-->
-            <button class="main-btn" onclick="location.href='/chat'">채팅하기 💬</button>
+            <button class="main-btn" onclick="location.href='/choice-prepare/{subject}'">객관식 모드 ✔️</button>
+            <button class="main-btn" onclick="location.href='/question-prepare/{subject}'">주관식 모드 ✍️</button>
         </div>
     </div>
 </body>
