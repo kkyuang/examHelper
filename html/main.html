@@ -7,11 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="http://fonts.googleapis.com/earlyaccess/notosanskr.css" rel="stylesheet">
-    <title>2021 본격 거창덕유중학교 시험 대비</title>
-    <meta name="title" content="2021 본격 거창덕유중학교 시험 대비">
+    <title>암기천국</title>
+    <meta name="title" content="암기천국">
     <meta name="author" content="뀨앙지윤">
     <link rel="stylesheet" href="/css/style.css">
-    <meta property="og:title" content="2021 본격 거창덕유중학교 시험 대비" />
+    <meta property="og:title" content="암기천국" />
     <meta property="og:description" content="암기과목을 쉽게 외울 수 있게 도와주는 웹사이트입니다 :)" />
     <script>
         $(function () {
@@ -30,19 +30,19 @@
             function mkMouseAni(key, effect) {
                 $(key).mouseenter(function (e, eft = effect) {
                     $(this).animate({
-                        backgroundColor: eft[0],
+                        //backgroundColor: eft[0],
                         color: eft[1]
                     }, 200)
                 });
                 $(key).mouseleave(function (e, eft = effect) {
                     $(this).animate({
-                        backgroundColor: eft[2],
+                        //backgroundColor: eft[2],
                         color: eft[3]
                     }, 200)
-                });
+                }); 
                 $(key).click(function (e, eft = effect) {
                     $(this).animate({
-                        backgroundColor: eft[2],
+                        //backgroundColor: eft[2],
                         color: eft[3]
                     }, 200)
                 });
@@ -53,19 +53,23 @@
 
 <body class="no-drag">
     <nav class="top-nav-bar">
-        <a class="navbar-brand" href="/">2021 본격 거창덕유중학교 시험 대비</a>
-        <a class="navbar-brand" style="color: #808080" href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
+        <a class="navbar-brand" style="top:25px; left: 0px; color: white; font-size: 25px;" href="/"><img src="/img/logo-white.svg" width="30px"
+            style="position: absolute; top:15px; left: 25px; transform: translate(0, -50%);" alt="logo"><span style="margin-left: 60px">암기천국</span></a>
+
+        <a class="navbar-brand" style="top:25px; right: 18px; transform: translate(0, -50%); color: white; font-size: 20px;" href="/">로그인되지 않음</a>
     </nav>
-    <div id="main-div" class="pannel">
-        <h1 class="title" style="font-size: 42px; height: 2em; margin-top: 1.5em;">본격 암기과목 외우기</h1>
-        <!--<img id="main-img" src="img/main-img.png" alt="메인 이미지">-->
+    <div style="margin-top: 48px; width: 100%; height: auto; text-align: center;">
+        <div>
+            <button class="main-btn" style="font-size: 24px; margin-left: 0;" onclick="location.href='/my-note'" style="margin-left: 0;">나의 노트</button>
+            <button class="main-btn" style="font-size: 24px;" onclick="location.href='/shared-note'">친구들의 노트</button>
+            <button class="main-btn" style="font-size: 24px;" onclick="location.href='/chat'">채팅</button>
+            <button class="main-btn" style="font-size: 24px;" onclick="location.href='/login'">로그인/회원가입</button>
+        </div>
         <br>
-        <div style="position:absolute; left: 50%; top: 50%; transform:translate(-50%, -50%); width: 100%;">
-            <h3>로그인하지 않음 님</h3>
-            <button class="main-btn" onclick="location.href='/login'" style="margin-top: 0;">로그인 ←</button>
-            <button class="main-btn" onclick="location.href='/subject-selection'">과목 선택 📖</button>
-            <!---<button class="main-btn" onclick="location.href='/rank'">랭킹 보기 🥇</button>-->
-            <button class="main-btn" onclick="location.href='/chat'">채팅하기 💬</button>
+        <div class="main-white-pannel" style="display:inline-block; text-align: center; margin-bottom: 48px;">
+            <div style="margin-top: 60; font-size: 30px;">낭비한 시간에 대한 후회는 더 큰 시간 낭비이다.</div>
+            <div style="margin-top: 16px; font-size: 20px;">-쎈수학책-</div>
+            <div style="margin-top: 48px; font-size: 36px;">D-20</div>
         </div>
     </div>
 </body>

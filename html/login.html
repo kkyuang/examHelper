@@ -7,12 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="http://fonts.googleapis.com/earlyaccess/notosanskr.css" rel="stylesheet">
-    <title>2021 거창덕유중학교 고사성어 외우기</title>
-    <meta name="title" content="2021 거창덕유중학교 고사성어 외우기">
+    <title>암기천국 : 로그인</title>
+    <meta name="title" content="암기천국 : 로그인">
     <meta name="author" content="뀨앙지윤">
     <link rel="stylesheet" href="/css/style.css">
-    <meta property="og:title" content="2021 거창덕유중학교 고사성어 외우기" />
-    <meta property="og:description" content="고사성어를 쉽게 외울 수 있는 웹사이트입니다 :)" />
+    <meta property="og:title" content="암기천국 : 로그인" />
+    <meta property="og:description" content="암기과목을 쉽게 외울 수 있게 도와주는 웹사이트입니다 :)" />
     <script>
         $(function () {
             var effectList = {
@@ -75,12 +75,12 @@
 
         $(document).ready(() => {
             $("#signup-btn").click(() => {
-                if(checkData($("#signup-nickname-input").val(), $("#signup-password-input").val())){
+                if (checkData($("#signup-nickname-input").val(), $("#signup-password-input").val())) {
                     $("#signup-form").submit()
                 }
             })
             $("#login-btn").click(() => {
-                if(checkData($("#login-nickname-input").val(), $("#login-password-input").val())){
+                if (checkData($("#login-nickname-input").val(), $("#login-password-input").val())) {
                     $("#login-form").submit()
                 }
             })
@@ -90,26 +90,30 @@
 
 <body class="no-drag">
     <nav class="top-nav-bar">
-        <a class="navbar-brand" href="/">2021 거창덕유중학교 고사성어 외우기</a>
-        <a class="navbar-brand" style="color: #808080"
-            href="https://www.youtube.com/channel/UC4xXYnoB9kFnxdUPG_Hcy7A">Made by 전지윤</a>
+        <a class="navbar-brand" style="top:25px; left: 0px; color: white; font-size: 25px;" href="/"><img
+                src="/img/logo-white.svg" width="30px"
+                style="position: absolute; top:15px; left: 25px; transform: translate(0, -50%);" alt="logo"><span
+                style="margin-left: 60px">암기천국</span></a>
+
+        <a class="navbar-brand"
+            style="top:25px; right: 18px; transform: translate(0, -50%); color: white; font-size: 20px;" href="/">로그인되지
+            않음</a>
     </nav>
-    <div id="main-div" class="pannel">
-        <h1 class="title" style="font-size: 42px; height: 2em; margin-top: 1.5em;">로그인/회원가입</h1>
-        <br>
-        <div style="position:absolute; left: 50%; top: 50%; transform:translate(-50%, -50%); width: 100%;">
-            <form action="/login" method="post" id="login-form" style="margin-bottom: 0;">
-                <input type="text" placeholder="닉네임" id="login-nickname-input" name="id">
-                <input type="password" style="margin-top: 5px;" placeholder="패스워드" id="login-password-input"
+    <div style="margin-top: 48px; width: 100%; height: auto; text-align: center;">
+        <div class="main-white-pannel" style="display:inline-block; text-align: center; margin-bottom: 48px; height: auto; width: 800px;">
+            <form action="/login" method="post" id="login-form" style="margin: 48px;  width: 50%; display: block; float: left;">
+                <input type="text" placeholder="닉네임" style="margin-top: 0px;  width: 100%;" id="login-nickname-input" name="id">
+                <input type="password" style="margin-top: 5px; width: 100%;" placeholder="패스워드" id="login-password-input"
                     name="password">
             </form>
-            <button id="login-btn" class="main-btn" style="margin-top: 5px;">로그인</button>
-            <form action="/signup" method="post" id="signup-form" style="margin-bottom: 0;">
-                <input type="text" placeholder="닉네임" id="signup-nickname-input" name="id">
-                <input type="password" style="margin-top: 5px;" placeholder="패스워드" id="signup-password-input"
+            <button id="login-btn" class="main-btn" style="width: 200px; height: 100px; float: right; margin: 48px; font-size: 24px;">로그인</button>
+            <br>
+            <form action="/signup" method="post" id="signup-form" style="margin: 48px;  margin-top: 24px; width: 50%; display: block; float: left;">
+                <input type="text" style="margin-top: 0px; width: 100%;" placeholder="닉네임" id="signup-nickname-input" name="id">
+                <input type="password" style="margin-top: 5px; width: 100%;" placeholder="패스워드" id="signup-password-input"
                     name="password">
             </form>
-            <button id="signup-btn" class="main-btn" style="margin-top: 5px;">회원가입 ←</button>
+            <button id="signup-btn" class="main-btn" style="width: 200px; height: 100px; float: right; margin: 48px; margin-top: 24px;font-size: 24px;">회원가입 ←</button>
         </div>
     </div>
 </body>

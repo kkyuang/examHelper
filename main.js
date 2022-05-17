@@ -1,3 +1,4 @@
+let express = require('express');
 var app = require('express')()
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
@@ -687,6 +688,9 @@ io.on('connection', (socket) => {
 app.get('/css/:name', function(request, response) {
   response.send(fs.readFileSync('css/' + request.params.name))
 });
+
+//img 라우팅
+app.use('/img', express.static('img'))
 
 //js 라우팅
 app.get('/js/:name', function(request, response) {
